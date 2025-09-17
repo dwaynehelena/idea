@@ -1,0 +1,3 @@
+100644 bcbac8e360ecb1677b2b5f11cdf15415b2493d2c 0	.github/chatmodes/codex.chatmode.md
+100644 896d45420ccacb3fe54f7bc8df8f07cf86c960a4 0	README.md
+100644 a92441758b1f57ea01d6224c21956ce4cc7a9964 0	galaga3d.html
