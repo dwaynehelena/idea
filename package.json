@@ -1,0 +1,18 @@
+{
+  "name": "galaga3d",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --outfile=dist/galaga3d.bundle.js --minify --sourcemap",
+    "serve": "python3 -m http.server 8000 -d dist",
+    "test:smoke": "node test/smoke.js",
+    "clean": "rm -rf dist node_modules package-lock.json"
+  },
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.4"
+    ,"playwright": "^1.46.0"
+  }
+}

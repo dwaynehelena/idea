@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Galaga3D Embed Example</title>
+</head>
+<body>
+  <h3>Galaga3D embed</h3>
+  <div id="host" style="width:640px;height:360px;border:1px solid #ccc"></div>
+  <script src="../dist/galaga3d.bundle.js"></script>
+  <script>
+    (async function(){
+      const Galaga = window.Galaga3D || window.default;
+      const host = document.getElementById('host');
+      const app = new Galaga(host,{});
+      app.onScore = s => console.log('score', s);
+      app.start();
+    })();
+  </script>
+</body>
+</html>
