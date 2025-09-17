@@ -81,7 +81,13 @@ class Galaga3D {
     for(let r=0;r<rows;r++){
       for(let c=0;c<cols;c++){
         const e = this._makeEnemy();
-        e.position.set(startX + c*spacingX, startY - r*spacingY, -10 - r*2);
+  e.position.set(startX + c*spacingX, startY - r*spacingY, -10 - r*2);
+  // store base position and add bobbing parameters
+  e.userData.basePos = e.position.clone();
+  e.userData.bobPhase = Math.random()*Math.PI*2;
+  e.userData.bobAmp = 0.4 + Math.random()*0.8;
+  e.userData.bobFreq = 0.004 + Math.random()*0.008;
+  e.userData.breach = null;
         e.userData.hit = false;
         this.enemies.add(e);
         this.enemyList.push(e);
@@ -125,6 +131,33 @@ class Galaga3D {
       }
     }
 
+    // enemy bobbing and occasional breach (dive) behavior
+    const nowTime = performance.now();
+    for(let ei=0; ei<this.enemyList.length; ei++){
+      const e = this.enemyList[ei];
+      if(!e || e.userData.hit) continue;
+      const ud = e.userData;
+      // bobbing
+      if(ud.basePos){
+        e.position.y = ud.basePos.y + Math.sin(nowTime * ud.bobFreq + ud.bobPhase) * ud.bobAmp;
+      }
+      // occasional breach: move forward then return
+      if(!ud.breach){
+        if(Math.random() < 0.0006 * dt){
+          ud.breach = { state: 'out', speed: 0.04 + Math.random()*0.06 };
+        }
+      }
+      if(ud.breach){
+        if(ud.breach.state === 'out'){
+          e.position.z += ud.breach.speed * dt;
+          if(e.position.z > (ud.basePos.z + 12)) ud.breach.state = 'back';
+        } else {
+          e.position.z -= ud.breach.speed * dt * 1.2;
+          if(e.position.z <= ud.basePos.z){ e.position.z = ud.basePos.z; ud.breach = null; }
+        }
+      }
+    }
+
     const sweep=this.enemySweep; sweep.offset=(sweep.offset||0)+sweep.dir*sweep.speed*dt; if(Math.abs(sweep.offset)>sweep.limit) sweep.dir*=-1; this.enemies.position.x = sweep.offset; if(this.enemyList.length===0) this.spawnEnemies();
 
     // update effects
@@ -135,6 +168,11 @@ class Galaga3D {
   _removeBullet(b){ const idx=this.bullets.indexOf(b); if(idx>=0) this.bullets.splice(idx,1); this.scene.remove(b); }
   _addScore(n){ this.score+=n; this.onScore(this.score); }
   dispose(){ this.pause(); window.removeEventListener('resize', this._onResize); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); if(this.renderer&&this.renderer.domElement&&this.renderer.domElement.parentNode) this.renderer.domElement.parentNode.removeChild(this.renderer.domElement); }
+}
+
+// also attach to window for non-module consumers
+if(typeof window !== 'undefined'){
+  window.Galaga3D = Galaga3D;
 }
 
 export default Galaga3D;
