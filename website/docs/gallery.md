@@ -2,11 +2,11 @@
 
 Below are example renders produced with `astonish.py`. Thumbnails link to the full-resolution images in the `outputs/` folder.
 
-<div style="display:flex;gap:24px;flex-wrap:wrap;">
+<div class="astonish-gallery">
 
-[![1080p thumbnail](../static/img/astonish_1920x1080_thumb.png)](/outputs/astonish_1920x1080.png)
+[![1080p thumbnail](../static/img/astonish_1920x1080_thumb.png)](/img/astonish_1920x1080.png)
 
-[![4K thumbnail](../static/img/astonish_3840x2160_thumb.png)](/outputs/astonish_3840x2160.png)
+[![4K thumbnail](../static/img/astonish_3840x2160_thumb.png)](/img/astonish_3840x2160.png)
 
 </div>
 
