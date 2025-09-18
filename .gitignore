@@ -1,5 +1,8 @@
-# Ignore generated outputs and build artifacts
-outputs/
+# Ignore generated outputs and build artifacts, but allow a curated selection
+# Ignore everything in outputs/ by default, then unignore specific curated files.
+outputs/*
+!outputs/astonish_1920x1080.png
+!outputs/.gitkeep
 website/.docusaurus/
 website/package-lock.json
 website/node_modules/

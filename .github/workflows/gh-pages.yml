@@ -22,8 +22,15 @@ jobs:
         run: |
           cd website
           npm run build
+      - name: Add CNAME (optional)
+        if: ${{ secrets.GH_PAGES_CNAME != '' }}
+        run: |
+          echo "${{ secrets.GH_PAGES_CNAME }}" > website/build/CNAME
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Publish to the gh-pages branch (default), change publish_branch if needed
+          publish_branch: gh-pages
           publish_dir: ./website/build
