@@ -1,0 +1,19 @@
+{
+  "id": "gallery",
+  "title": "Gallery",
+  "description": "Below are example renders produced with astonish.py. The images were generated and saved into the repository outputs/ folder.",
+  "source": "@site/docs/gallery.md",
+  "sourceDirName": ".",
+  "slug": "/gallery",
+  "permalink": "/docs/gallery",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "docs",
+  "previous": {
+    "title": "Architecture",
+    "permalink": "/docs/architecture"
+  }
+}
