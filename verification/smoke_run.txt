@@ -1,2 +1,0 @@
-server started on 8123
-Galaga3D constructor exists: true
