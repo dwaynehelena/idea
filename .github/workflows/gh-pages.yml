@@ -1,4 +1,5 @@
 name: Build and Publish Docusaurus site (with daily art)
+name: Build and Publish Docusaurus site (with daily art)
 
 on:
   push:
