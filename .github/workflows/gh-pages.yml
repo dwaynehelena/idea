@@ -4,11 +4,9 @@ name: Build and Publish Docusaurus site (with daily art)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
   schedule:
-    # Run daily at 08:00 UTC
     - cron: '0 8 * * *'
 
 permissions:
@@ -17,11 +15,25 @@ permissions:
   id-token: write
 
 jobs:
-  build:
+  smoke:
+    name: Runner smoke test
     runs-on: ubuntu-latest
-    concurrency:
-      group: gh-pages-build
-      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Print versions
+        run: |
+          echo "GITHUB_REF=$GITHUB_REF"
+          python --version || true
+          node --version || true
+          npm --version || true
+
+  build-and-deploy:
+    name: Build site and deploy to GitHub Pages
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -38,7 +50,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pillow
 
-      - name: Generate daily art (if scheduled or manual)
+      - name: Generate daily art
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
@@ -47,7 +59,7 @@ jobs:
           YMD=$(date -u +%Y%m%d)
           FILE="website/static/img/daily/astonish_${YMD}_${GITHUB_RUN_ID}.png"
           echo "Generating art to $FILE"
-          python astonish.py --mode flow --width 1920 --height 1080 --steps 1000 --particles 60000 --seed $GITHUB_RUN_NUMBER --png "$FILE"
+          python astonish.py --mode flow --width 1280 --height 720 --steps 400 --particles 20000 --seed $GITHUB_RUN_NUMBER --png "$FILE"
           echo "Generated: $FILE"
 
       - name: Setup Node
@@ -70,7 +82,7 @@ jobs:
         run: |
           echo "${{ secrets.GH_PAGES_CNAME }}" > website/build/CNAME
 
-      - name: Deploy to GitHub Pages (peaceiris)
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
