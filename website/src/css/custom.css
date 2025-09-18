@@ -1,2 +1,16 @@
 /* Minimal custom CSS for Astonish site */
 body { font-family: -apple-system, system-ui, sans-serif; }
+
+.astonish-gallery {
+	display: flex;
+	gap: 24px;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+.astonish-gallery img {
+	max-width: 320px;
+	height: auto;
+	border-radius: 6px;
+	box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
