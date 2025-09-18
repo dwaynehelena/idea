@@ -4,7 +4,6 @@ outputs/*
 !outputs/astonish_1920x1080.png
 !outputs/.gitkeep
 website/.docusaurus/
-website/package-lock.json
 website/node_modules/
 node_modules/
 .venv_astonish/
