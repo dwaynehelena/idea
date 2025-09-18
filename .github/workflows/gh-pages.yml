@@ -1,27 +1,63 @@
-name: Build and Publish Docusaurus site
+name: Build and Publish Docusaurus site (with daily art)
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch: {}
+  schedule:
+    # Run daily at 08:00 UTC
+    - cron: '0 8 * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    concurrency:
+      group: gh-pages-build
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Pillow (for PNG output)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pillow
+
+      - name: Generate daily art (if scheduled or manual)
+        # always run for push/schedule/dispatch; generation writes into website/static so the build picks it up
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          mkdir -p website/static/img/daily
+          YMD=$(date -u +%Y%m%d)
+          FILE="website/static/img/daily/astonish_${YMD}_${GITHUB_RUN_ID}.png"
+          echo "Generating art to $FILE"
+          python astonish.py --mode flow --width 1920 --height 1080 --steps 1000 --particles 60000 --seed $GITHUB_RUN_NUMBER --png "$FILE"
+          echo "Generated: $FILE"
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+
       - name: Install dependencies
         run: |
           cd website
           npm ci
+
       - name: Build site
         run: |
           cd website
           npm run build
+
       - name: Add CNAME (optional)
         if: ${{ secrets.GH_PAGES_CNAME != '' }}
         run: |
@@ -31,6 +67,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Publish to the gh-pages branch (default), change publish_branch if needed
           publish_branch: gh-pages
           publish_dir: ./website/build
