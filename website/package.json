@@ -1,0 +1,14 @@
+{
+  "name": "astonish-website",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "start": "docusaurus start",
+    "build": "docusaurus build",
+    "serve": "docusaurus serve"
+  },
+  "dependencies": {
+    "@docusaurus/core": "^3.0.0",
+    "@docusaurus/preset-classic": "^3.0.0"
+  }
+}
