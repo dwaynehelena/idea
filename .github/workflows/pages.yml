@@ -31,13 +31,10 @@ jobs:
           cd website
           npm run build
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v3
-
-      - name: Upload Pages artifact
-        # Use v2 which depends on a non-deprecated upload-artifact implementation
-        uses: actions/upload-pages-artifact@v2
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
         with:
+          name: website-build
           path: website/build
 
   deploy:
@@ -47,5 +44,14 @@ jobs:
       pages: write
       id-token: write
     steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: website-build
+          path: website_build
+
       - name: Deploy to GitHub Pages
+        # deploy-pages expects the built site in the working directory, so point it at the downloaded folder
         uses: actions/deploy-pages@v1
+        with:
+          artifact_path: website_build/website/build
