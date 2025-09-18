@@ -4,10 +4,16 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: {}
+  workflow_dispatch:
   schedule:
     # Run daily at 08:00 UTC
     - cron: '0 8 * * *'
+
+# Grant the permissions needed to build and publish Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build:
@@ -31,7 +37,6 @@ jobs:
           python -m pip install pillow
 
       - name: Generate daily art (if scheduled or manual)
-        # always run for push/schedule/dispatch; generation writes into website/static so the build picks it up
         env:
           GITHUB_RUN_ID: ${{ github.run_id }}
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
@@ -58,14 +63,17 @@ jobs:
           cd website
           npm run build
 
-      - name: Add CNAME (optional)
-        if: ${{ secrets.GH_PAGES_CNAME != '' }}
-        run: |
-          echo "${{ secrets.GH_PAGES_CNAME }}" > website/build/CNAME
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./website/build
+          path: website/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
