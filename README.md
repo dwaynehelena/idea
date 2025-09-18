@@ -22,7 +22,13 @@ python3 astonish.py --mode flow --width 1920 --height 1080 --steps 1000 --partic
 ```
 
 - Write a PNG directly (requires Pillow):
+Or, if Pillow is not installed, you can ask `astonish.py` to create a local venv and install Pillow for you:
 
+```
+python3 astonish.py --mode flow --width 1920 --height 1080 --steps 1000 --particles 60000 --seed 42 --png outputs/astonish_1920x1080.png --ensure-pillow
+```
+
+Write a PNG directly (requires Pillow):
 ```
 python3 astonish.py --mode flow --width 1920 --height 1080 --steps 1000 --particles 60000 --seed 42 --png outputs/astonish_1920x1080.png
 ```

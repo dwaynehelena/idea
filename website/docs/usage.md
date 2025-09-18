@@ -32,4 +32,10 @@ Or write a PNG directly using the new `--png` flag (requires Pillow):
 python3 astonish.py --mode flow --width 1920 --height 1080 --steps 1000 --particles 60000 --seed 42 --png outputs/astonish_1920x1080.png
 ```
 
+If Pillow is not available in your interpreter, you can pass `--ensure-pillow` to create a local virtualenv and install Pillow automatically:
+
+```
+python3 astonish.py --mode flow --width 1920 --height 1080 --steps 1000 --particles 60000 --seed 42 --png outputs/astonish_1920x1080.png --ensure-pillow
+```
+
 Tip: full-resolution renders (4K) are CPU and memory intensive. Use smaller resolutions or fewer particles for quick iteration.

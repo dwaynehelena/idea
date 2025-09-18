@@ -10,6 +10,8 @@ import math
 import os
 import random
 import sys
+import subprocess
+import tempfile
 from dataclasses import dataclass
 from typing import Callable, List, Tuple
 
@@ -299,6 +301,7 @@ def main():
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--out", type=str, help="output PPM file path")
     p.add_argument("--png", type=str, help="output PNG file path (requires Pillow)")
+    p.add_argument("--ensure-pillow", action="store_true", help="If Pillow missing, create venv and install it to produce PNG")
     p.add_argument("--ascii", action="store_true", help="print ASCII preview to terminal")
     args = p.parse_args()
 
@@ -337,7 +340,38 @@ def main():
             img.write_png(args.png)
             print(f"Wrote {args.png}")
         except RuntimeError as e:
-            print(str(e), file=sys.stderr)
+            # If Pillow isn't available in this interpreter, optionally create a venv, install Pillow,
+            # and perform conversion there. This keeps the running interpreter unchanged.
+            if getattr(args, 'ensure_pillow', False):
+                # write a temporary PPM and convert using the venv python
+                tmp = tempfile.NamedTemporaryFile(suffix='.ppm', delete=False)
+                tmp_path = tmp.name
+                tmp.close()
+                try:
+                    img.write_ppm(tmp_path)
+                    venv_dir = os.path.join(os.getcwd(), '.venv_astonish')
+                    venv_python = os.path.join(venv_dir, 'bin', 'python')
+                    # Create venv if missing
+                    if not os.path.exists(venv_python):
+                        print('Creating virtualenv for Pillow at', venv_dir)
+                        subprocess.check_call([sys.executable, '-m', 'venv', venv_dir])
+                    # Install pillow in the venv
+                    print('Installing Pillow in the virtualenv...')
+                    subprocess.check_call([venv_python, '-m', 'pip', 'install', '--upgrade', 'pip'])
+                    subprocess.check_call([venv_python, '-m', 'pip', 'install', 'pillow'])
+                    # Run a small conversion script with the venv python
+                    cmd = [venv_python, '-c', (
+                        "from PIL import Image; im=Image.open(\"%s\"); im.save(\"%s\")" % (tmp_path.replace('"','\"'), args.png.replace('"','\"'))
+                    )]
+                    subprocess.check_call(cmd)
+                    print(f'Wrote {args.png}')
+                finally:
+                    try:
+                        os.remove(tmp_path)
+                    except Exception:
+                        pass
+            else:
+                print(str(e), file=sys.stderr)
 
 if __name__ == "__main__":
     main()
