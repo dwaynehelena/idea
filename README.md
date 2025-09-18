@@ -1,15 +1,10 @@
-Galaga3D — single-file 3D Galaga demo/library
+# Astonish — zero-dependency generative art tool
 
-Files
-- `galaga3d.html` — Self-contained single-file library + demo. Drop it on a static host or open locally in a browser. Requires network access to load Three.js from unpkg.
+This repository contains a small single-file renderer `astonish.py` that produces high-quality generative art as PPM/PNG outputs and a Docusaurus-based website in `website/` for documentation and a gallery.
 
-Usage
-- Open `galaga3d.html` in a browser.
-- Controls: arrow keys to move, Space to shoot, Start/Pause/Reset buttons.
+## Quickstart
 
-Command-line rendering (Astonish):
-
-- ASCII preview:
+- ASCII preview in terminal:
 
 ```
 python3 astonish.py --mode flow --width 160 --height 90 --steps 200 --particles 2000 --seed 42 --ascii
@@ -21,24 +16,12 @@ python3 astonish.py --mode flow --width 160 --height 90 --steps 200 --particles 
 python3 astonish.py --mode flow --width 1920 --height 1080 --steps 1000 --particles 60000 --seed 42 --out outputs/astonish_1920x1080.ppm
 ```
 
-- Write a PNG directly (requires Pillow):
-Or, if Pillow is not installed, you can ask `astonish.py` to create a local venv and install Pillow for you:
+- Write a PNG directly (requires Pillow). If Pillow is not installed, use `--ensure-pillow` to create a venv and install it:
 
 ```
 python3 astonish.py --mode flow --width 1920 --height 1080 --steps 1000 --particles 60000 --seed 42 --png outputs/astonish_1920x1080.png --ensure-pillow
 ```
 
-Write a PNG directly (requires Pillow):
-```
-python3 astonish.py --mode flow --width 1920 --height 1080 --steps 1000 --particles 60000 --seed 42 --png outputs/astonish_1920x1080.png
-```
+## License
 
-API
-- window.Galaga3D(container, opts) — constructor. `container` can be a DOM element or selector.
-  - instance.start() — start the game loop
-  - instance.pause() — pause the game
-  - instance.reset() — reset enemies and score
-  - instance.onScore — callback(score)
-
-License
-- MIT
+MIT
