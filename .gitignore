@@ -12,3 +12,8 @@ node_modules/
 coverage/
 npm-debug.log*
 dist/*.map
+
+.venv/
+__pycache__/
+*.pyc
+.next/
