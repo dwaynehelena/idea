@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>idea // autonomous register</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030712;
+            --glass: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.5);
+            --purple: #818cf8;
+            --text-main: #f3f4f6;
+            --text-dim: #9ca3af;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(129, 140, 248, 0.05) 0%, transparent 40%);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.03;
+            z-index: 9999;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3FfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        header {
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, var(--accent), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: lowercase;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: right;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+        }
+
+        main {
+            flex: 1;
+            padding: 4rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .hero {
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 300;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .hero h1 span {
+            font-weight: 700;
+            color: var(--accent);
+            text-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-bar {
+            margin: 2rem auto 4rem;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 1.2rem 1.5rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+
+        .search-bar input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            animation: fadeIn 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--accent), var(--purple));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .card-desc {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            flex: 1;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .date {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-style: italic;
+        }
+
+        footer {
+            padding: 4rem 5%;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+            margin-top: 4rem;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .dodge-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.2rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 100px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            border: 1px solid var(--glass-border);
+        }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2.5rem; }
+            .stats-container { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+
+    <header>
+        <div class="logo">idea</div>
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-value" id="total-ideas">0</span>
+                <span class="stat-label">Active Ideas</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="deployment-rate">98%</span>
+                <span class="stat-label">Efficiency</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Autonomous <span>Intelligence</span> Register</h1>
+            <p>A high-fidelity nexus for conceptual expansion and project tracking within the idea ecosystem.</p>
+        </section>
+
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Query the register...">
+        </div>
+
+        <div class="grid" id="idea-grid">
+            <!-- Cards injected via JS -->
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="dodge-badge">
+                <span>🐕</span>
+                <span>Dodge Integrated</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 1rem;">
+                &copy; 2026 idea // Experimental Autonomous Node
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        const MOCK_DATA = [
+            {
+                id: 1,
+                title: "Neural Synergy Protocol",
+                description: "Optimizing cross-agent communication through low-latency telemetry sharing and weighted consensus algorithms.",
+                category: "CORE ARCHITECTURE",
+                status: "Active",
+                date: "2026.03.05"
+            },
+            {
+                id: 2,
+                title: "Quantum State Indexer",
+                description: "Persistent memory structure utilizing probabilistic data models to handle high-velocity stream processing.",
+                category: "DATABASE",
+                status: "Deploying",
+                date: "2026.03.08"
+            },
+            {
+                id: 3,
+                title: "Glassmorphic UI Engine",
+                description: "Next-gen rendering pipeline for real-time visualization of multi-dimensional data arrays.",
+                category: "FRONTEND",
+                status: "Optimizing",
+                date: "2026.03.09"
+            },
+            {
+                id: 4,
+                title: "Autonomous Refactorist",
+                description: "Self-healing code routines that identify bottlenecks and propose structural optimizations in real-time.",
+                category: "DEV OPS",
+                status: "Experimental",
+                date: "2026.02.28"
+            },
+            {
+                id: 5,
+                title: "Edge Semantic Cache",
+                description: "Distributed caching layer that understands query intent to pre-fetch related knowledge nodes.",
+                category: "NETWORKING",
+                status: "Beta",
+                date: "2026.03.01"
+            },
+            {
+                id: 6,
+                title: "Dodge Compliance Layer",
+                description: "Ensuring all autonomous output meets the rigorous high-standard integration protocols of the Dodge system.",
+                category: "INTEGRATION",
+                status: "Certified",
+                date: "2026.03.09"
+            }
+        ];
+
+        const grid = document.getElementById('idea-grid');
+        const searchInput = document.getElementById('search-input');
+        const totalCount = document.getElementById('total-ideas');
+
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/ideas-register.json');
+                if (!response.ok) throw new Error('API Unavailable');
+                const data = await response.json();
+                renderCards(data.ideas || data);
+            } catch (err) {
+                console.warn('Using mock data: API fetch failed');
+                renderCards(MOCK_DATA);
+            }
+        }
+
+        function renderCards(ideas) {
+            grid.innerHTML = '';
+            totalCount.innerText = ideas.length;
+            
+            ideas.forEach((idea, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                card.innerHTML = `
+                    <span class="card-tag">${idea.category}</span>
+                    <h3 class="card-title">${idea.title}</h3>
+                    <p class="card-desc">${idea.description}</p>
+                    <div class="card-footer">
+                        <div class="status">
+                            <span class="status-dot" style="background: ${getStatusColor(idea.status)}; box-shadow: 0 0 10px ${getStatusColor(idea.status)};"></span>
+                            <span>${idea.status}</span>
+                        </div>
+                        <span class="date">${idea.date}</span>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        function getStatusColor(status) {
+            const s = status.toLowerCase();
+            if (s.includes('active') || s.includes('deploy')) return '#38bdf8';
+            if (s.includes('exp') || s.includes('beta')) return '#818cf8';
+            if (s.includes('opt') || s.includes('cert')) return '#10b981';
+            return '#9ca3af';
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            
+            cards.forEach((card, idx) => {
+                const title = card.querySelector('.card-title').innerText.toLowerCase();
+                const desc = card.querySelector('.card-desc').innerText.toLowerCase();
+                const tag = card.querySelector('.card-tag').innerText.toLowerCase();
+                
+                if (title.includes(query) || desc.includes(query) || tag.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize
+        fetchData();
+
+        // Add some mouse parallax effect to cards
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            document.body.style.backgroundPosition = `${x * 20}px ${y * 20}px`;
+        });
+    </script>
+</body>
+</html>

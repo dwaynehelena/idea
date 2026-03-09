@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>idea | Generative Art & Idea Registry</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --surface: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+            --accent: #7000ff;
+            --accent-glow: rgba(112, 0, 255, 0.3);
+            --glass: rgba(15, 15, 15, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, .logo {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Background Gradient */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, #1a0b2e 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, #0b1a2e 0%, transparent 40%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .search-container {
+            flex: 0 1 400px;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            color: white;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--accent-glow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background: var(--surface);
+        }
+
+        /* Hero Section */
+        header {
+            padding: 6rem 2rem 4rem;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        header p {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+        }
+
+        /* Grid Layout */
+        main {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .art-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(112, 0, 255, 0.4);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+        }
+
+        .card-visual {
+            height: 240px;
+            background: #111;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-visual canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+        }
+
+        .author {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent), #ff00ff);
+        }
+
+        .stats {
+            display: flex;
+            gap: 1rem;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+
+        /* Modal placeholder */
+        #registration-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: #111;
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        form input, form textarea {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 0.8rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-family: inherit;
+        }
+
+        footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 1rem; }
+            .search-container { display: none; }
+            header { padding: 4rem 1rem 2rem; }
+            .art-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+
+    <nav>
+        <div class="logo">IDEA<span>.</span></div>
+        <div class="search-container">
+            <input type="text" placeholder="Search algorithms, ideas, or artists..." id="searchInput">
+        </div>
+        <div class="nav-actions">
+            <a href="#" class="btn btn-outline">Explore</a>
+            <button class="btn btn-primary" onclick="toggleModal(true)">Register Idea</button>
+        </div>
+    </nav>
+
+    <header>
+        <h1>The Registry of <span>Algorithmic</span> Thought.</h1>
+        <p>A decentralized vault for generative art blueprints, creative algorithms, and unique digital concepts.</p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <button class="btn btn-primary btn-lg" style="padding: 1rem 2rem;">Browse Latest</button>
+            <button class="btn btn-outline btn-lg" style="padding: 1rem 2rem;">How it works</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="filter-tabs">
+            <div class="tab active">All Concepts</div>
+            <div class="tab">Generative Art</div>
+            <div class="tab">Perlin Noise</div>
+            <div class="tab">Fractals</div>
+            <div class="tab">L-Systems</div>
+            <div class="tab">Neural Nets</div>
+            <div class="tab">Minimalism</div>
+        </div>
+
+        <div class="art-grid" id="artGrid">
+            <!-- Cards will be injected here -->
+        </div>
+    </main>
+
+    <div id="registration-modal">
+        <div class="modal-box">
+            <span class="close-modal" onclick="toggleModal(false)">&times;</span>
+            <h2 style="margin-bottom: 1rem;">Register New Idea</h2>
+            <form onsubmit="event.preventDefault(); toggleModal(false);">
+                <label>Title</label>
+                <input type="text" placeholder="e.g. Recursive Forest Gen">
+                <label>Category</label>
+                <input type="text" placeholder="e.g. L-Systems">
+                <label>Concept Description</label>
+                <textarea rows="4" placeholder="Describe the algorithm..."></textarea>
+                <button class="btn btn-primary" style="width: 100%;">Submit to Registry</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 IDEA Registry. Powered by Generative Thought.</p>
+    </footer>
+
+    <script>
+        const MOCK_DATA = [
+            { id: 1, title: "Neural Drift", tag: "Generative Art", author: "Aura.eth", likes: 124, type: 'circles', desc: "A study on how neural connections can be visualized using particle flow and attraction fields." },
+            { id: 2, title: "Recursive Bloom", tag: "Fractals", author: "0xFractal", likes: 89, type: 'lines', desc: "Algorithmic flora generated via recursive branch splitting and Fibonacci sequencing." },
+            { id: 3, title: "Noise Terrain", tag: "Perlin Noise", author: "GeoGen", likes: 256, type: 'rects', desc: "3D heightmaps generated using layered Simplex noise and erosion simulation." },
+            { id: 4, title: "Vibe Mesh", tag: "Minimalism", author: "PixelSavant", likes: 45, type: 'circles', desc: "Minimalist geometric compositions that react to ambient frequency data." },
+            { id: 5, title: "Entropy v1", tag: "L-Systems", author: "ChaosTheory", likes: 167, type: 'lines', desc: "Simulating the breakdown of structured systems through random iterative mutations." },
+            { id: 6, title: "Prism Flux", tag: "Color Theory", author: "Chromatic", likes: 312, type: 'rects', desc: "Real-time color interpolation based on dynamic lighting models." }
+        ];
+
+        function createCard(item) {
+            return `
+                <div class="card">
+                    <div class="card-visual">
+                        <canvas id="canvas-${item.id}"></canvas>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-tag">${item.tag}</span>
+                        <h3 class="card-title">${item.title}</h3>
+                        <p class="card-desc">${item.desc}</p>
+                        <div class="card-footer">
+                            <div class="author">
+                                <div class="avatar" style="background: ${getRandomGradient()}"></div>
+                                <span>${item.author}</span>
+                            </div>
+                            <div class="stats">
+                                <span>❤ ${item.likes}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getRandomGradient() {
+            const colors = ['#7000ff', '#ff00ff', '#00d4ff', '#ff8a00', '#00ffaa'];
+            const c1 = colors[Math.floor(Math.random() * colors.length)];
+            const c2 = colors[Math.floor(Math.random() * colors.length)];
+            return `linear-gradient(45deg, ${c1}, ${c2})`;
+        }
+
+        function drawArt(canvasId, type) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width = canvas.offsetWidth;
+            const h = canvas.height = canvas.offsetHeight;
+            
+            ctx.clearRect(0, 0, w, h);
+            ctx.strokeStyle = 'rgba(112, 0, 255, 0.4)';
+            ctx.fillStyle = 'rgba(112, 0, 255, 0.1)';
+
+            if (type === 'circles') {
+                for(let i=0; i<20; i++) {
+                    ctx.beginPath();
+                    ctx.arc(Math.random()*w, Math.random()*h, Math.random()*40, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            } else if (type === 'lines') {
+                for(let i=0; i<30; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(Math.random()*w, Math.random()*h);
+                    ctx.lineTo(Math.random()*w, Math.random()*h);
+                    ctx.stroke();
+                }
+            } else {
+                for(let i=0; i<15; i++) {
+                    const size = Math.random()*50;
+                    ctx.strokeRect(Math.random()*w, Math.random()*h, size, size);
+                }
+            }
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('artGrid');
+            grid.innerHTML = MOCK_DATA.map(item => createCard(item)).join('');
+            
+            // Allow DOM to update before drawing
+            setTimeout(() => {
+                MOCK_DATA.forEach(item => drawArt(`canvas-${item.id}`, item.type));
+            }, 50);
+        }
+
+        function toggleModal(show) {
+            document.getElementById('registration-modal').style.display = show ? 'flex' : 'none';
+        }
+
+        // Initialize
+        renderGrid();
+
+        // Search interactivity
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, idx) => {
+                const title = MOCK_DATA[idx].title.toLowerCase();
+                if (title.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Tab interactivity
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelector('.tab.active').classList.remove('active');
+                tab.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

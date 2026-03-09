@@ -1,0 +1,6 @@
+Add 10 new features to this repository using live, non-mocked APIs (e.g., weather, crypto prices, news, system stats, etc.).
+1. Investigate the project structure to identify the best way to integrate these features.
+2. Use stable, no-auth APIs where possible.
+3. Implement all 10 features directly in the code.
+4. Verify they are functional.
+Do not use mocks. After implementation, commit the changes with message "feat: add 10 live API modules".
